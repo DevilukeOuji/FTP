@@ -75,4 +75,16 @@ public class FTPImplementation extends UnicastRemoteObject implements FTP{
 
 		return files_list_str;
 	}
+
+	public boolean Delete(String serverpath) throws RemoteException{
+		
+		File server_file = new File(serverpath);
+		if(server_file.exists()){
+			return server_file.delete();
+		}
+		else{
+			System.out.println("Arquivo inexistente");
+			return false;
+		}
+	}
 }

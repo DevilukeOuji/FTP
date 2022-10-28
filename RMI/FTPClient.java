@@ -5,89 +5,133 @@ import java.util.Scanner;
 
 public class FTPClient {
 
-    public static void main( String[] args ) {
+    String serverpath;
 
-		String serverpath;
-		String upload = "upload";
-		String download = "download";
-        String list = "list";
+    public static void main(String[] args)
+	{
+		FTPClient client = new FTPClient();
+		client.Connect();	
+	}
+
+    public void Connect(){
 
         try {
 
             FTP ftp = (FTP) Naming.lookup("//127.0.0.1/FTP");
-
-			if(upload.equals(args[0]))
-			{
-
+            while(true)
+		{
+            try{
+                System.out.println("Menu : \n1 Upload \n2 Download \n3 Listar arquivos\n4 Excluir Arquivos\nEscolha: ");
                 Scanner myObj = new Scanner(System.in);
-                System.out.println("Informe o arquivo:");
-                String filepath = myObj.nextLine(); 
-				serverpath = "./Files/";
-				
-				File input_file = new File(filepath);
-                if(input_file.exists()){
-                    byte [] mydata=new byte[(int) input_file.length()];
-                    FileInputStream input_stream =new FileInputStream(input_file);	
-                    input_stream.read(mydata, 0, mydata.length);	
-                    ftp.Upload(mydata, serverpath + filepath, (int) input_file.length());
-                    input_stream.close();
-                }
-                else
+                String inputFromUser = myObj.nextLine(); 
+                int i = Integer.parseInt(inputFromUser);
+                switch(i)
                 {
-                    System.out.println("Arquivo inexistente");
-                }
-			}
-            if(download.equals(args[0]))
-            {   
-                Scanner myObj = new Scanner(System.in);
-                System.out.println("Informe o arquivo:");
-                String filepath = myObj.nextLine(); 
-				serverpath = "./Files/"  + filepath;
-                byte [] data;
-                try{
-                    data = ftp.Download(serverpath);
-                    if(data == null){
-                        System.out.println("Arquivo inexistente.");
-                        return;
-                    }
-                    File clientfile = new File("./" + filepath);
-                    FileOutputStream output_stream = new FileOutputStream(clientfile);
-
-                    System.out.println("Download Concluido");
-                    
-                    output_stream.write(data);
-                    output_stream.flush();
-                    output_stream.close();
-                 }catch(NullPointerException e){
-                    System.out.println("Arquivo inexistente.");
-                }
+                    case 1: Send(ftp); break;
+                    case 2: Receive(ftp); break;
+                    case 3: List(ftp); break;
+                    case 4: Del(ftp); break;
+                    default: System.out.println("Õpção inválida !");
+                } 
+            }catch(Exception e)
+            {
+                System.out.println("Ocorreu um erro!");
             }
-
-            if(list.equals(args[0])){
-                String files_list = ftp.ListFiles();
-                System.out.println(files_list);
-            }
-
+		}
         }
         catch(Exception e)
-		{
-			e.printStackTrace();
-			System.out.println("error with connection or command. Check your hostname or command");
-		}	
-        /*catch ( MalformedURLException murle ) {
-            System.out.println( );
-            System.out.println( "MalformedURLException" );
-            System.out.println( murle );
+        {
+            e.printStackTrace();
+            System.out.println("error with connection or command. Check your hostname or command");
         }
-        catch ( RemoteException re ) {
-            System.out.println( );
-            System.out.println( "RemoteException" );
-            System.out.println( re );
+    
+    }
+
+    public void Send(FTP ftp)
+    {
+
+        try{
+            Scanner myObj = new Scanner(System.in);
+            System.out.println("Informe o arquivo:");
+            String filepath = myObj.nextLine(); 
+            serverpath = "./Files/";
+            
+            File input_file = new File(filepath);
+            if(input_file.exists()){
+                byte [] mydata=new byte[(int) input_file.length()];
+                FileInputStream input_stream =new FileInputStream(input_file);	
+                input_stream.read(mydata, 0, mydata.length);	
+                ftp.Upload(mydata, serverpath + filepath, (int) input_file.length());
+                input_stream.close();
+            }
+            else
+            {
+                System.out.println("Arquivo inexistente");
+            }
         }
-        catch ( NotBoundException nbe ) {
-            System.out.println( );
-            System.out.println( "NotBoundException" );
-            System.out.println( nbe );
-        }*/
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    public void Receive(FTP ftp)
+    {   
+        try{
+            Scanner myObj = new Scanner(System.in);
+            System.out.println("Informe o arquivo:");
+            String filepath = myObj.nextLine(); 
+            serverpath = "./Files/"  + filepath;
+            byte [] data;
+            try{
+                data = ftp.Download(serverpath);
+                if(data == null){
+                    System.out.println("Arquivo inexistente.");
+                    return;
+                }
+                File clientfile = new File("./" + filepath);
+                FileOutputStream output_stream = new FileOutputStream(clientfile);
+
+                System.out.println("Download Concluido");
+                
+                output_stream.write(data);
+                output_stream.flush();
+                output_stream.close();
+                }catch(NullPointerException e){
+                System.out.println("Arquivo inexistente.");
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void List(FTP ftp){
+        try{
+
+            String files_list = ftp.ListFiles();
+            System.out.println(files_list);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void Del(FTP ftp){
+        try{ 
+            Scanner myObj = new Scanner(System.in);
+            System.out.println("Informe o arquivo para deletar:");
+            String filepath = myObj.nextLine(); 
+            serverpath = "./Files/"  + filepath;
+            try{
+                ftp.Delete(serverpath);
+
+                System.out.println("Arquivo deletado.");
+                }catch(NullPointerException e){
+                System.out.println("Arquivo inexistente.");
+            } 
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
