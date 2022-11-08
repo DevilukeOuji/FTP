@@ -1,10 +1,10 @@
 import java.rmi.Naming;
 
 public class FTPServer{
-    public FTPServer() {
+    public FTPServer(String[] args) {
         try {
             FTP obj = new FTPImplementation();
-            Naming.rebind("//127.0.0.1/FTP", obj);
+            Naming.rebind("//" + args[0] +"/FTP", obj);
         }
         catch( Exception e) {
             System.out.println("Erro: " + e);
@@ -12,6 +12,6 @@ public class FTPServer{
     }
     
     public static void main( String[] args ) {
-        new FTPServer( );
+        new FTPServer(args);
     }
 }

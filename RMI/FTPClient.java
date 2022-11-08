@@ -10,14 +10,14 @@ public class FTPClient {
     public static void main(String[] args)
 	{
 		FTPClient client = new FTPClient();
-		client.Connect();	
+		client.Connect(args);	
 	}
 
-    public void Connect(){
+    public void Connect(String[] args){
 
         try {
 
-            FTP ftp = (FTP) Naming.lookup("//127.0.0.1/FTP");
+            FTP ftp = (FTP) Naming.lookup("//" + args[0] +"/FTP");
             while(true)
 		{
             try{
